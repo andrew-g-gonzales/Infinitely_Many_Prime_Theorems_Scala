@@ -5,6 +5,8 @@ import primes.util.Primes
 
 /*
 https://www.math.utah.edu/~pa/math/q2.html
+
+https://www-users.cs.york.ac.uk/susan/cyc/p/primeprf.htm
 *
 * */
 object EuclidsProof {
