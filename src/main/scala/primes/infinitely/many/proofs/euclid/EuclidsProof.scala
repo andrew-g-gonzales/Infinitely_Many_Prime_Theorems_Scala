@@ -2,6 +2,8 @@ package primes.infinitely.many.proofs.euclid
 
 import primes.util.Primes
 
+import scala.annotation.tailrec
+
 
 /*
 https://www.math.utah.edu/~pa/math/q2.html
@@ -13,21 +15,46 @@ object EuclidsProof {
 
   def main(args: Array[String]): Unit = {
 
-    List.range(3L, 14L).foreach(l =>{
-
-      val numbers = euclidsInfinitelyManyPrimes(l)
-      val number = numbers.head
-      val result = if(Primes.isPrime(number)) s"$number is prime" else number
-      println((numbers.foldLeft(List[Long]())((a,b) => b :: a)).mkString(",")+" ="+result)
-    })
+    proof(List[Long](2L),13)
   }
 
-  def productPlusOne(finiteListOfPrimes: List[Long], numToAdd: Long = 1): Long
-                            = (finiteListOfPrimes.foldLeft(1L)(_ * _)) + numToAdd
+  def printProof(numbers:List[Long] )= {
+    val number  = (numbers.foldLeft(1L)(_ * _)) + 1
+    val result = Primes.isPrime(number) match {
+      case true => s"$number, is prime"
+      case false =>{
+        val tuple = divisibleByGreaterPrime(numbers.head, number)
+        s"$number = ${tuple._1}*${tuple._2}"
+      }
+    }
 
-  def euclidsInfinitelyManyPrimes(limit: Long): List[Long] = {
-
-    val finiteListOfPrimes = Primes.generatePrimes(limit-2 )
-    productPlusOne(finiteListOfPrimes):: finiteListOfPrimes
+    println((numbers.foldLeft(List[Long]())((a,b) => b :: a)).mkString(",")+"+1 = "+result)
   }
+
+  def proof(list:List[Long], limit:Long):Unit = {
+
+    limit match  {
+      case x if x < 1 =>{
+        printProof(list)
+      }
+      case _ =>{
+        printProof(list)
+        proof(addNextPrime(list), limit-1)
+      }
+    }
+  }
+
+  def addNextPrime(list:List[Long]):List[Long]=Primes.findNextPrime(list.head+1)::list
+
+  @tailrec
+  def divisibleByGreaterPrime(p:Long, number:Long):(Long,Long) = {
+
+    val next = Primes.findNextPrime(p+1)
+    (number % p ==0) match {
+      case true => (p, number/p)
+      case false => divisibleByGreaterPrime(next,number)
+    }
+  }
+
+
 }
